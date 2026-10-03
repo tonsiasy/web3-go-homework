@@ -1,5 +1,7 @@
 package homework01
 
+import "strconv"
+
 // 1. 只出现一次的数字
 // 给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
 func SingleNumber(nums []int) int {
@@ -21,8 +23,27 @@ func SingleNumber(nums []int) int {
 // 2. 回文数
 // 判断一个整数是否是回文数
 func IsPalindrome(x int) bool {
-	// TODO: implement
-	return false
+	if x < 0 {
+		return false
+	}
+
+	if x < 10 {
+		return true
+	}
+
+	if x%10 == 0 && x > 10 {
+		return false
+	}
+
+	s := strconv.Itoa(x)
+
+	for l, r := 0, len(s)-1; l < r; l, r = l+1, r-1 {
+		if s[l] != s[r] {
+			return false
+		}
+	}
+
+	return true
 }
 
 // 3. 有效的括号
