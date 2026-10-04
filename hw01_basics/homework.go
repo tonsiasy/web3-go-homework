@@ -95,8 +95,26 @@ func IsValid(s string) bool {
 // 4. 最长公共前缀
 // 查找字符串数组中的最长公共前缀
 func LongestCommonPrefix(strs []string) string {
-	// TODO: implement
-	return ""
+	//fmt.Printf("%s\n", strs[0])
+	if len(strs) == 0 {
+		return ""
+	}
+
+	for i := 0; i < len(strs[0]); i++ {
+		for j := 1; j < len(strs); j++ {
+
+			if len(strs[j]) == i {
+				fmt.Printf("%s\n", strs[j])
+				return strs[0][:i]
+			}
+
+			if strs[0][i] != strs[j][i] {
+				return strs[0][:i]
+			}
+		}
+	}
+
+	return strs[0]
 }
 
 // 5. 加一
