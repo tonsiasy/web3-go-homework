@@ -1,6 +1,9 @@
 package homework01
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 // 1. 只出现一次的数字
 // 给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
@@ -49,7 +52,38 @@ func IsPalindrome(x int) bool {
 // 3. 有效的括号
 // 给定一个只包括 '(', ')', '{', '}', '[', ']' 的字符串，判断字符串是否有效
 func IsValid(s string) bool {
-	// TODO: implement
+	stack := []byte{}
+	pairs := map[byte]byte{
+		')': '(',
+		']': '[',
+		'}': '{',
+	}
+
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if m, ok := pairs[c]; ok {
+			//这里说明是右括号，出栈
+			//取栈顶
+			top := stack[len(stack)-1]
+			if top == m {
+				stack = stack[:len(stack)-1]
+			} else {
+				fmt.Printf("Invalid: 出现的右括号%c与栈顶的左括号%c不配对\n", c, top)
+				return false
+			}
+		} else {
+			//持续出现左括号，入栈
+			stack = append(stack, c)
+			fmt.Println(string(stack))
+		}
+	}
+
+	if len(stack) == 0 {
+		return true
+	}
+
+	fmt.Printf("Invalid: 栈中残余左括号%s\n", string(stack))
+
 	return false
 }
 
