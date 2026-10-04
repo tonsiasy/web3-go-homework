@@ -103,6 +103,8 @@ func TestIsValid(t *testing.T) {
 		{"Example 3", "(]", false},
 		{"Example 4", "([)]", false},
 		{"Example 5", "{[]}", true},
+		{"Example 6", "(((()))(", false},
+		{"Example 7", "(((())))))", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

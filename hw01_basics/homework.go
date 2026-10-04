@@ -63,6 +63,11 @@ func IsValid(s string) bool {
 		c := s[i]
 		if m, ok := pairs[c]; ok {
 			//这里说明是右括号，出栈
+			// 【防御】如果是个右括号，但栈是空的，说明它没有对应的左括号，空栈再执行出线的操作会导致panic: runtime error: index out of range [-1]
+			if len(stack) == 0 {
+				fmt.Printf("Invalid: 空栈情况下先出现了右括号%c\n", c)
+				return false
+			}
 			//取栈顶
 			top := stack[len(stack)-1]
 			if top == m {
