@@ -95,7 +95,6 @@ func IsValid(s string) bool {
 // 4. 最长公共前缀
 // 查找字符串数组中的最长公共前缀
 func LongestCommonPrefix(strs []string) string {
-	//fmt.Printf("%s\n", strs[0])
 	if len(strs) == 0 {
 		return ""
 	}
@@ -120,8 +119,19 @@ func LongestCommonPrefix(strs []string) string {
 // 5. 加一
 // 给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一
 func PlusOne(digits []int) []int {
-	// TODO: implement
-	return nil
+	//大端模式存储，默认小学算数进位答题
+	for i := len(digits) - 1; i >= 0; i-- {
+		if digits[i] < 9 {
+			digits[i]++
+			return digits
+		} else {
+			digits[i] = 0
+		}
+	}
+
+	result := make([]int, len(digits)+1)
+	result[0] = 1
+	return result
 }
 
 // 6. 删除有序数组中的重复项
