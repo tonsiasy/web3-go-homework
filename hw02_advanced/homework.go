@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 	// "sync/atomic"
+	"math"
 	"time"
 )
 
@@ -75,30 +76,26 @@ type Rectangle struct {
 	Height float64
 }
 
-// TODO: 为 Rectangle 实现 Shape 接口
+// 为 Rectangle 实现 Shape 接口
 func (r *Rectangle) Area() float64 {
-	// TODO: 实现代码
-	return 0
+	return r.Height * r.Width
 }
 
 func (r *Rectangle) Perimeter() float64 {
-	// TODO: 实现代码
-	return 0
+	return (r.Height + r.Width) * 2
 }
 
 type Circle struct {
 	Radius float64
 }
 
-// TODO: 为 Circle 实现 Shape 接口
+// 为 Circle 实现 Shape 接口
 func (c *Circle) Area() float64 {
-	// TODO: 实现代码
-	return 0
+	return math.Pi * c.Radius * c.Radius
 }
 
 func (c *Circle) Perimeter() float64 {
-	// TODO: 实现代码
-	return 0
+	return 2 * math.Pi * c.Radius
 }
 
 // Q6: 面向对象 - 组合
