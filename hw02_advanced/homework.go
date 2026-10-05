@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 	// "sync/atomic"
-	// "time"
+	"time"
 )
 
 // Q1: 指针 - 增加值
@@ -49,7 +49,18 @@ func PrintOddEven() {
 // Q4: Goroutine - 任务调度
 // 设计一个任务调度器，接收一组任务（可以用函数表示），并使用协程并发执行这些任务，同时统计每个任务的执行时间。
 func TaskScheduler(tasks []func()) {
-	// TODO: 实现代码
+	var wg sync.WaitGroup
+	for i, task := range tasks {
+		id := i
+		t := task
+		wg.Go(func() {
+			start := time.Now()
+			t()
+			fmt.Printf("任务ID: %d 耗时: %v\n", id, time.Since(start))
+		})
+	}
+
+	wg.Wait()
 }
 
 // Q5: 面向对象 - 接口
