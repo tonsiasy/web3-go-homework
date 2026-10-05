@@ -27,25 +27,21 @@ func DoubleSlice(slice *[]int) {
 func PrintOddEven() {
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		for i := 0; i <= 10; i++ {
 			if i&0x01 == 1 {
-				fmt.Printf("Even:%v\n", i)
-			}
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for i := 0; i <= 10; i++ {
-			if i&0x01 == 0 {
 				fmt.Printf("Odd:%v\n", i)
 			}
 		}
-	}()
+	})
+
+	wg.Go(func() {
+		for i := 0; i <= 10; i++ {
+			if i&0x01 == 0 {
+				fmt.Printf("Even:%v\n", i)
+			}
+		}
+	})
 
 	wg.Wait()
 }
