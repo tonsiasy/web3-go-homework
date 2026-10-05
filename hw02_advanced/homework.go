@@ -1,11 +1,11 @@
 package homework02
 
-//import (
-//	"fmt"
-//	"sync"
-//	"sync/atomic"
-//	"time"
-//)
+import (
+	"fmt"
+	"sync"
+	// "sync/atomic"
+	// "time"
+)
 
 // Q1: 指针 - 增加值
 // 编写一个函数，该函数接收一个整数指针作为参数，在函数内部将该指针指向的值增加10
@@ -25,7 +25,29 @@ func DoubleSlice(slice *[]int) {
 // 编写一个程序，使用 go 关键字启动两个协程，一个协程打印从1到10的奇数，另一个协程打印从2到10的偶数。
 // 提示：为了测试能看到输出，可以使用 sync.WaitGroup 确保主程序等待协程结束
 func PrintOddEven() {
-	// TODO: 实现代码
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i <= 10; i++ {
+			if i&0x01 == 1 {
+				fmt.Printf("Even:%v\n", i)
+			}
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i <= 10; i++ {
+			if i&0x01 == 0 {
+				fmt.Printf("Odd:%v\n", i)
+			}
+		}
+	}()
+
+	wg.Wait()
 }
 
 // Q4: Goroutine - 任务调度
