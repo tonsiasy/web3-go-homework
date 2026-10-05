@@ -16,7 +16,9 @@ func AddTen(val *int) {
 // Q2: 指针 - 切片元素乘2
 // 实现一个函数，接收一个整数切片的指针，将切片中的每个元素乘以2
 func DoubleSlice(slice *[]int) {
-	// TODO: 实现代码
+	for i, v := range *slice {
+		(*slice)[i] = 2 * v
+	}
 }
 
 // Q3: Goroutine - 奇偶数打印
