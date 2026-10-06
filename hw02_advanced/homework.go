@@ -2,9 +2,9 @@ package homework02
 
 import (
 	"fmt"
-	"sync"
-	// "sync/atomic"
 	"math"
+	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -182,6 +182,16 @@ func MutexCounter() int {
 // 启动10个协程，每个协程对计数器进行1000次递增操作，最后输出计数器的值。
 func AtomicCounter() int32 {
 	var count int32
-	// TODO: 实现代码
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Go(func() {
+			for range 1000 {
+				atomic.AddInt32(&count, 1)
+			}
+		})
+	}
+
+	wg.Wait()
+	fmt.Printf("Count:%v\n", count)
 	return count
 }
