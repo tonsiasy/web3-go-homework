@@ -160,8 +160,20 @@ func BufferedChannel() {
 // 启动10个协程，每个协程对计数器进行1000次递增操作，最后输出计数器的值。
 func MutexCounter() int {
 	var count int
-	// var mu sync.Mutex
-	// TODO: 实现代码
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	for range 10 {
+		wg.Go(func() {
+			for range 1000 {
+				mu.Lock()
+				count++
+				mu.Unlock()
+			}
+		})
+	}
+
+	wg.Wait()
+	fmt.Printf("Count:%v\n", count)
 	return count
 }
 
