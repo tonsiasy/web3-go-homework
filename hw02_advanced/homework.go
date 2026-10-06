@@ -141,7 +141,18 @@ func ProducerConsumer() []int {
 // Q8: Channel - 缓冲通道
 // 实现一个带有缓冲的通道，生产者协程向通道中发送100个整数，消费者协程从通道中接收这些整数并打印。
 func BufferedChannel() {
-	// TODO: 实现代码
+	ch := make(chan int, 100)
+
+	go func() {
+		for i := 0; i <= 100; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+
+	for v := range ch {
+		fmt.Printf("%v\t", v)
+	}
 }
 
 // Q9: 锁机制 - Mutex
