@@ -122,7 +122,19 @@ func (e Employee) PrintInfo() string {
 // 为了方便测试，请将接收到的数字返回
 func ProducerConsumer() []int {
 	var result []int
-	// TODO: 实现代码
+	ch := make(chan int)
+
+	go func() {
+		for i := 1; i <= 10; i++ {
+			ch <- i
+		}
+		close(ch)
+	}()
+
+	for v := range ch {
+		result = append(result, v)
+	}
+
 	return result
 }
 
