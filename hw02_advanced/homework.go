@@ -111,10 +111,9 @@ type Employee struct {
 	EmployeeID string
 }
 
-// TODO: 为 Employee 结构体实现一个 PrintInfo() string 方法，返回员工的信息 (格式自定，包含Name, Age, EmployeeID)
+// 为 Employee 结构体实现一个 PrintInfo() string 方法，返回员工的信息 (格式自定，包含Name, Age, EmployeeID)
 func (e Employee) PrintInfo() string {
-	// TODO: 实现代码
-	return ""
+	return fmt.Sprintf("Name: %s, Age: %d, ID: %s", e.Name, e.Age, e.EmployeeID)
 }
 
 // Q7: Channel - 生产者消费者
