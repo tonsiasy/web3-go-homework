@@ -29,7 +29,7 @@ func PrintOddEven() {
 	var wg sync.WaitGroup
 
 	wg.Go(func() {
-		for i := 0; i <= 10; i++ {
+		for i := 1; i <= 10; i++ {
 			if i&0x01 == 1 {
 				fmt.Printf("Odd:%v\n", i)
 			}
@@ -37,7 +37,7 @@ func PrintOddEven() {
 	})
 
 	wg.Go(func() {
-		for i := 0; i <= 10; i++ {
+		for i := 1; i <= 10; i++ {
 			if i&0x01 == 0 {
 				fmt.Printf("Even:%v\n", i)
 			}
@@ -144,7 +144,7 @@ func BufferedChannel() {
 	ch := make(chan int, 100)
 
 	go func() {
-		for i := 0; i <= 100; i++ {
+		for i := 0; i < 100; i++ {
 			ch <- i
 		}
 		close(ch)
