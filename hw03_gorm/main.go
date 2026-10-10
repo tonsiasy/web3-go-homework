@@ -53,7 +53,7 @@ func (c *Comment) AfterDelete(tx *gorm.DB) error {
 	return nil
 }
 
-func init_mock_data(db *gorm.DB) {
+func initMockData(db *gorm.DB) {
 	// 每次启动先检查是否已有数据，防止重复插入
 	var count int64
 	db.Model(&User{}).Count(&count)
@@ -102,7 +102,7 @@ func init_mock_data(db *gorm.DB) {
 	}
 }
 
-func print_post_with_comment_of_user(db *gorm.DB, name string) {
+func printPostsWithCommentsOfUser(db *gorm.DB, name string) {
 	var user User
 
 	// Preload("Posts") 查出文章，Preload("Posts.Comments") 顺藤摸瓜查出文章下的评论
@@ -133,7 +133,7 @@ type PostWithCount struct {
 	CommentCount int // 专门接收 COUNT 出来的别名数据
 }
 
-func print_most_commented_post(db *gorm.DB) {
+func printMostCommentedPost(db *gorm.DB) {
 	var result PostWithCount // 使用 DTO 作为结果接收器
 
 	err := db.Model(&Post{}).
@@ -156,7 +156,7 @@ func print_most_commented_post(db *gorm.DB) {
 	fmt.Println("=====================================")
 }
 
-func publish_post(db *gorm.DB) {
+func publishPost(db *gorm.DB) {
 	var user User
 	if err := db.Where("name = ?", "Bob").First(&user).Error; err != nil {
 		log.Printf("查询用户失败: %v\n", err)
@@ -184,7 +184,7 @@ func publish_post(db *gorm.DB) {
 	fmt.Printf("📮 发文后 %s 的文章数: %d\n", updated.Name, updated.PostCount)
 }
 
-func delete_comment(db *gorm.DB) {
+func deleteComment(db *gorm.DB) {
 	// 找到只有 1 条评论的文章（"Go 语言并发指南"）
 	var post Post
 	err := db.Where("title = ?", "Go 语言并发指南").First(&post).Error
@@ -225,18 +225,18 @@ func main() {
 	fmt.Println("hello GORM")
 
 	//初始化填充测数据
-	init_mock_data(db)
+	initMockData(db)
 
 	// 应题目2.1
-	print_post_with_comment_of_user(db, "Alice")
-	print_post_with_comment_of_user(db, "Bob")
+	printPostsWithCommentsOfUser(db, "Alice")
+	printPostsWithCommentsOfUser(db, "Bob")
 
 	// 应题目2.2
-	print_most_commented_post(db)
+	printMostCommentedPost(db)
 
 	// 应题目3.1：创建文章触发 AfterCreate
-	publish_post(db)
+	publishPost(db)
 
 	// 应题目3.2：删除评论触发 AfterDelete
-	delete_comment(db)
+	deleteComment(db)
 }
