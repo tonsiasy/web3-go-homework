@@ -101,17 +101,33 @@ func print_post_with_comment_of_user(db *gorm.DB, name string) {
 	fmt.Println("=====================================")
 }
 
-func print_most_commented_post(db *gorm.DB) {
-	var post Post
+// 引入 DTO (Data Transfer Object) 隔离视图数据与底层模型
+type PostWithCount struct {
+	Post             // 匿名嵌套：继承 Post 原有的所有字段
+	CommentCount int // 专门接收 COUNT 出来的别名数据
+}
 
-	err := db.Model(&Post{}).Select("posts.*, COUNT(comments.id) as comment_count").Joins("LEFT JOIN comments ON comments.post_id = posts.id").Group("posts.id").Order("comment_count DESC").First(&post).Error
+func print_most_commented_post(db *gorm.DB) {
+	var result PostWithCount // 使用 DTO 作为结果接收器
+
+	err := db.Model(&Post{}).
+		Select("posts.*, COUNT(comments.id) as comment_count").
+		Joins("LEFT JOIN comments ON comments.post_id = posts.id").
+		Group("posts.id").
+		Order("comment_count DESC").
+		First(&result).Error
 
 	if err != nil {
 		log.Println("查询失败:", err)
 		return
 	}
 
-	fmt.Printf("🔥 评论最多的文章是: [%s], 内容: %s\n", post.Title, post.Content)
+	fmt.Println("=====================================")
+	fmt.Printf("🔥 评论最多的文章揭晓！\n")
+	fmt.Printf("📝 标题: [%s]\n", result.Title)
+	fmt.Printf("💬 内容: %s\n", result.Content)
+	fmt.Printf("📊 统计: 共计 %d 条评论\n", result.CommentCount)
+	fmt.Println("=====================================")
 }
 
 func main() {
