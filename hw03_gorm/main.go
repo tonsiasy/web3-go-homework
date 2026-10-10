@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -9,22 +10,47 @@ import (
 
 type User struct {
 	gorm.Model
-	Name  string
-	Posts []Post
+	Name      string
+	PostCount int
+	Posts     []Post
 }
 
 type Post struct {
 	gorm.Model
-	Title    string
-	Content  string
-	UserID   uint
-	Comments []Comment
+	Title         string
+	Content       string
+	CommentStatus string // "有评论" / "无评论"
+	UserID        uint
+	Comments      []Comment
 }
 
 type Comment struct {
 	gorm.Model
 	Content string
 	PostID  uint
+}
+
+// 题目3.1：文章创建后，自动把作者的 PostCount +1
+// 使用钩子传入的 tx，与创建文章处于同一事务，失败会一起回滚
+func (p *Post) AfterCreate(tx *gorm.DB) error {
+	return tx.Model(&User{}).
+		Where("id = ?", p.UserID).
+		UpdateColumn("post_count", gorm.Expr("post_count + ?", 1)).Error
+}
+
+// 题目3.2：评论删除后，若文章已无评论，则把文章的评论状态改为 "无评论"
+func (c *Comment) AfterDelete(tx *gorm.DB) error {
+	// 软删除的记录会被 Count 自动排除
+	var count int64
+	if err := tx.Model(&Comment{}).Where("post_id = ?", c.PostID).Count(&count).Error; err != nil {
+		return err
+	}
+	if count == 0 {
+		return tx.Model(&Post{}).
+			Where("id = ?", c.PostID).
+			UpdateColumn("comment_status", "无评论").Error
+	}
+	return nil
 }
 
 func init_mock_data(db *gorm.DB) {
@@ -130,6 +156,61 @@ func print_most_commented_post(db *gorm.DB) {
 	fmt.Println("=====================================")
 }
 
+func publish_post(db *gorm.DB) {
+	var user User
+	if err := db.Where("name = ?", "Bob").First(&user).Error; err != nil {
+		log.Printf("查询用户失败: %v\n", err)
+		return
+	}
+	fmt.Printf("📮 发文前 %s 的文章数: %d\n", user.Name, user.PostCount)
+
+	// 通过 UserID 关联创建文章，Create 成功后会触发 Post 的 AfterCreate 钩子
+	post := Post{
+		Title:   "钩子函数测试文章",
+		Content: "验证 AfterCreate 是否自动更新 PostCount",
+		UserID:  user.ID,
+	}
+	if err := db.Create(&post).Error; err != nil {
+		log.Printf("发布文章失败: %v\n", err)
+		return
+	}
+
+	// 重新查询，拿到钩子更新后的数据库值
+	var updated User
+	if err := db.First(&updated, user.ID).Error; err != nil {
+		log.Printf("重新查询用户失败: %v\n", err)
+		return
+	}
+	fmt.Printf("📮 发文后 %s 的文章数: %d\n", updated.Name, updated.PostCount)
+}
+
+func delete_comment(db *gorm.DB) {
+	// 找到只有 1 条评论的文章（"Go 语言并发指南"）
+	var post Post
+	err := db.Where("title = ?", "Go 语言并发指南").First(&post).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Println("没有找到该文章")
+		return
+	}
+	if err != nil {
+		log.Printf("查询文章失败: %v\n", err)
+		return
+	}
+
+	// 必须先查出完整的 Comment 对象再删除，钩子里才能拿到 PostID
+	var comment Comment
+	if err := db.Where("post_id = ?", post.ID).First(&comment).Error; err != nil {
+		fmt.Println("🗑  该文章已没有评论可删，跳过")
+	} else if err := db.Delete(&comment).Error; err != nil {
+		log.Printf("删除评论失败: %v\n", err)
+		return
+	}
+
+	var updated Post
+	db.First(&updated, post.ID)
+	fmt.Printf("🗑  文章 [%s] 的评论状态: %q\n", updated.Title, updated.CommentStatus)
+}
+
 func main() {
 	// 应题目要求1
 	// 连接本地 SQLite 数据库（如果文件不存在会自动创建）
@@ -153,4 +234,9 @@ func main() {
 	// 应题目2.2
 	print_most_commented_post(db)
 
+	// 应题目3.1：创建文章触发 AfterCreate
+	publish_post(db)
+
+	// 应题目3.2：删除评论触发 AfterDelete
+	delete_comment(db)
 }
