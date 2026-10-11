@@ -138,7 +138,7 @@ func printMostCommentedPost(db *gorm.DB) {
 
 	err := db.Model(&Post{}).
 		Select("posts.*, COUNT(comments.id) as comment_count").
-		Joins("LEFT JOIN comments ON comments.post_id = posts.id").
+		Joins("LEFT JOIN comments ON comments.post_id = posts.id AND comments.deleted_at IS NULL").
 		Group("posts.id").
 		Order("comment_count DESC").
 		First(&result).Error
